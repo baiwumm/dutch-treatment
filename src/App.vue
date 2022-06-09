@@ -9,10 +9,8 @@ const state = reactive<any>({
 
 <template>
   <el-config-provider :locale="state.locale">
-    <div class="container" style="width: 1200px; margin: 0 auto;padding-top:50px">
-      <XmwPer
-      >
-      </XmwPer>
+    <div class="container" style="width: 1200px; margin: 0 auto;padding-top:20px">
+      <XmwPer/>
     </div>
   </el-config-provider>
 </template>
