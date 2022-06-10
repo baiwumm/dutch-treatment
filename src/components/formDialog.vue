@@ -36,20 +36,35 @@ import { ElMessage } from "element-plus";
 const emits = defineEmits(["getPeopleData"]);
 const dialogFormVisible = ref(false);
 const ruleFormRef = ref<FormInstance>();
+// 自定义校验名字
+const validateName = (rule: any, value: any, callback: any) => {
+  let people = JSON.parse(localStorage.getItem("people")).map((el) => el.name);
+  if (!value) {
+    callback(new Error("请输入姓名"));
+  } else if (value.length > 4) {
+    callback(new Error("名字长度不能大于4"));
+  } else if (people.includes(value)) {
+    callback(new Error("名字已存在，请重新输入"));
+  } else {
+    callback();
+  }
+};
+
+const validateKey = (rule: any, value: any, callback: any) => {
+  let people = JSON.parse(localStorage.getItem("people")).map((el) => el.value);
+  if (!value) {
+    callback(new Error("请输入唯一Key"));
+  } else if (value.length > 10) {
+    callback(new Error("key长度不能大于10"));
+  } else if (people.includes(value)) {
+    callback(new Error("唯一key已存在，请重新输入"));
+  } else {
+    callback();
+  }
+};
 const rules = reactive<FormRules>({
-  name: [
-    { required: true, message: "请输入姓名", trigger: "blur" },
-    { min: 1, max: 4, message: "名字长度不能大于4", trigger: "blur" },
-  ],
-  onlyKey: [
-    { required: true, message: "请输入唯一Key", trigger: "blur" },
-    {
-      min: 1,
-      max: 10,
-      message: "名字长度不能大于10,建议使用姓名拼音",
-      trigger: "blur",
-    },
-  ],
+  name: [{ required: true, validator: validateName, trigger: "blur" }],
+  onlyKey: [{ required: true, validator: validateKey, trigger: "blur" }],
 });
 const ruleForm = reactive({
   name: "",
