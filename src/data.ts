@@ -40,8 +40,6 @@ export const tableConfig = {
     showAppend: false,
     handlerConfig: {
         align: "center",
-        width: 140,
-        fixed: 'right'
     },
 }
 
@@ -55,12 +53,6 @@ people.map((p) => {
     });
 });
 export const defaultColumns: any = [
-    {
-        label: 'id',
-        prop: 'id',
-        width: 100,
-        align: "center"
-    },
     {
         label: '日期',
         prop: 'date',
@@ -77,7 +69,6 @@ export const defaultColumns: any = [
         label: '消费金额（元）',
         prop: 'consumptionAmount',
         width: 150,
-        sortable: true,
         align: "center"
     }
 ]
@@ -127,38 +118,5 @@ export interface SpanMethodProps {
     columnIndex: number
 }
 
-export function formatRowspanAndColspan(tableData, tableKey) {
-    const newArr = []
-    // 分类检出tempList中的数据push到newArr中
-    for (let i = 0; i < tableData.length;) {
-        let count = 0
-        for (let j = i; j < tableData.length; j++) {
-            if (tableKey === 'dataType') {
-                if (tableData[i].dataType === tableData[j].dataType) {
-                    count++
-                }
-            }
-        }
-        if (tableKey === 'dataType') {
-            newArr.push({
-                data: tableData[i].dataType,
-                num: count
-            })
-        }
-        i += count
-    }
-    // 根据此算法，格式化newArr中的数据
-    for (let k = 0; k < newArr.length; k++) {
-        if (newArr[k].num > 1 || newArr[k].num === 0) {
-            for (let w = k; w < newArr[k].num + k - 1; w++) {
-                newArr.splice(w + 1, 0, {
-                    data: newArr[k].data,
-                    num: 0
-                })
-            }
-        }
-    }
-    return newArr
-}
 
 

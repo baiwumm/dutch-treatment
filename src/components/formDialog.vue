@@ -12,10 +12,18 @@
       ref="ruleFormRef"
     >
       <el-form-item label="姓名" prop="name">
-        <el-input v-model="ruleForm.name" autocomplete="off" />
+        <el-input
+          v-model="ruleForm.name"
+          autocomplete="off"
+          placeholder="请输入姓名，例如：张三"
+        />
       </el-form-item>
       <el-form-item label="唯一Key" prop="onlyKey">
-        <el-input v-model="ruleForm.onlyKey" autocomplete="off" />
+        <el-input
+          v-model="ruleForm.onlyKey"
+          autocomplete="off"
+          placeholder="请输入唯一Key，例如：zhangsan"
+        />
       </el-form-item>
     </el-form>
     <template #footer>

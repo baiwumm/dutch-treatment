@@ -1,3 +1,4 @@
+/* eslint-disable */
 <template>
   <!-- 添加 people -->
   <el-space wrap>
@@ -16,6 +17,7 @@
     <el-button type="primary" @click="openConsumerDialog"
       >添加消费数据</el-button
     >
+    <el-button type="info" @click="usingDocument">使用文档</el-button>
     <formDialog ref="formDialogRef" @get-people-data="getPeopleData" />
     <consumerDialog ref="consumerDialogRef" @splitAmount="splitAmount" />
   </el-space>
@@ -31,15 +33,18 @@
     :columns="state.firstLoad ? firstColumns : state.tableColumns"
     :tableConfig="tableConfig"
     :showPagination="false"
-    :default-sort="{ prop: 'date', order: 'ascending' }"
     style="margin-top: 20px"
+    :span-method="objectSpanMethod"
   >
     <template v-slot:handler="{ scope }">
       <el-button
         size="small"
         type="primary"
-        @click="handlerEdit(scope)"
-        :disabled="scope.$index == state.tableData.length - 1"
+        @click="
+          scope.$index == state.tableData.length - 1
+            ? hanglerEditSpending(scope)
+            : handlerEdit(scope)
+        "
         >编辑</el-button
       >
       <el-button
@@ -51,14 +56,18 @@
       >
     </template>
   </Xmwtable>
+  <spendingDialog ref="spendingDialogRef" @spendingAmount="spendingAmount" />
+  <documentDrawer ref="documentDrawerRef" />
 </template>
 <script setup lang="ts">
 import { nextTick, ref, reactive, onMounted } from "vue";
 import { ElInput, ElMessage, ElMessageBox } from "element-plus";
 import moment from "moment";
-import Xmwtable from "./XmwTable.vue";
-import formDialog from "./formDialog.vue";
-import consumerDialog from "./consumerDialog.vue";
+import Xmwtable from "./XmwTable.vue"; // 公共表格组件
+import formDialog from "./formDialog.vue"; // 添加消费伙伴组件
+import consumerDialog from "./consumerDialog.vue"; // 添加消费数据组件
+import spendingDialog from "./spendingDialog.vue"; // 添加支出数据组件
+import documentDrawer from "./documentDrawer.vue"; // 使用文档抽屉组件
 import {
   people,
   tableConfig,
@@ -68,12 +77,13 @@ import {
   consumptionAmountModel,
   SummaryMethodProps,
   SpanMethodProps,
-  formatRowspanAndColspan,
   uuid,
 } from "../data";
 
 const formDialogRef = ref<HTMLElement | null>(null);
 const consumerDialogRef = ref<HTMLElement | null>(null);
+const spendingDialogRef = ref<HTMLElement | null>(null);
+const documentDrawerRef = ref<HTMLElement | null>(null);
 const inputValue = ref(""); // 输入框绑定值
 const dynamicTags = ref([]); // 获取loacalstorage的值
 const state = reactive<any>({
@@ -90,6 +100,11 @@ function initData() {
   dynamicTags.value = people.map((v: peopleModel) => v.name);
   // 初始化默认插入一条支出数据，不支持修改
   if (tableData) {
+    tableData.sort(
+      (a, b) =>
+        Date.parse(a.date.replace(/-/g, "/")) -
+        Date.parse(b.date.replace(/-/g, "/"))
+    );
     state.tableData = tableData;
   } else {
     // 生成 table 数据
@@ -149,10 +164,16 @@ const splitAmount = (data: consumptionAmountModel) => {
     state.tableData = tableData;
     localStorage.setItem("tableData", JSON.stringify(tableData));
   } else {
+    tableData.push(tableObj);
     // 插入表格
-    state.tableData.splice(state.tableData.length - 1, 0, tableObj);
+    tableData.sort(
+      (a, b) =>
+        Date.parse(a.date.replace(/-/g, "/")) -
+        Date.parse(b.date.replace(/-/g, "/"))
+    );
+    state.tableData = tableData;
     // 保存在localstorage
-    localStorage.setItem("tableData", JSON.stringify(state.tableData));
+    localStorage.setItem("tableData", JSON.stringify(tableData));
   }
 };
 
@@ -250,7 +271,7 @@ const getSummaries = (param: SummaryMethodProps) => {
         } else if (data.length - 1 == $index) {
           if (Number.isNaN(curr)) curr = 0;
           return (
-            Math.floor((index === 3 ? prev - curr : curr - prev) * 100) / 100
+            Math.floor((index === 2 ? prev - curr : curr - prev) * 100) / 100
           );
         } else {
           return Math.floor(prev * 100) / 100;
@@ -270,28 +291,49 @@ const objectSpanMethod = ({
   rowIndex,
   columnIndex,
 }: SpanMethodProps) => {
-  // columnIndex代表列，合并表格
-  const newArr = formatRowspanAndColspan(state.tableData, "dataType");
-  // 合并第二列 日期（星期）
-  if (columnIndex === 1) {
-    const num = newArr[rowIndex].num;
-    if (num > 1) {
-      return {
-        rowspan: num,
-        colspan: 1,
-      };
-    } else if (num < 1) {
-      return {
-        rowspan: 1,
-        colspan: num,
-      };
+  const dataProvider = state.tableData;
+  if (columnIndex === 0) {
+    // 上一条数据
+    const prevRow = dataProvider[rowIndex - 1];
+    // 下一条数据
+    let nextRow = dataProvider[rowIndex + 1];
+    if (prevRow && prevRow.date === row.date) {
+      return { rowspan: 0, colspan: 0 };
     } else {
-      return {
-        rowspan: 1,
-        colspan: 1,
-      };
+      let rowspan = 1;
+      while (nextRow && nextRow.date === row.date) {
+        rowspan++;
+        nextRow = dataProvider[rowspan + rowIndex];
+      }
+      if (rowspan > 1) {
+        return { rowspan, colspan: 1 };
+      }
     }
   }
+};
+
+// 添加支出数据
+const hanglerEditSpending = (scope) => {
+  spendingDialogRef.value.initDialog();
+};
+
+const spendingAmount = (data) => {
+  let tableData = JSON.parse(localStorage.getItem("tableData"));
+  Reflect.ownKeys(data).forEach((key) => {
+    tableData[tableData.length - 1][key] = data[key];
+  });
+  tableData.sort(
+    (a, b) =>
+      Date.parse(a.date.replace(/-/g, "/")) -
+      Date.parse(b.date.replace(/-/g, "/"))
+  );
+  state.tableData = tableData;
+  localStorage.setItem("tableData", JSON.stringify(tableData));
+};
+
+// 打开使用文档
+const usingDocument = () => {
+  documentDrawerRef.value.drawer = true;
 };
 
 onMounted(() => {
