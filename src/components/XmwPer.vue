@@ -23,7 +23,7 @@
   </el-space>
 
   <!-- 数据表格 -->
-  <Xmwtable
+  <vue3-xmw-table
     stripe
     border
     show-summary
@@ -55,7 +55,7 @@
         >删除</el-button
       >
     </template>
-  </Xmwtable>
+  </vue3-xmw-table>
   <spendingDialog ref="spendingDialogRef" @spendingAmount="spendingAmount" />
   <documentDrawer ref="documentDrawerRef" />
 </template>
@@ -63,7 +63,6 @@
 import { nextTick, ref, reactive, onMounted } from "vue";
 import { ElInput, ElMessage, ElMessageBox } from "element-plus";
 import moment from "moment";
-import Xmwtable from "./XmwTable.vue"; // 公共表格组件
 import formDialog from "./formDialog.vue"; // 添加消费伙伴组件
 import consumerDialog from "./consumerDialog.vue"; // 添加消费数据组件
 import spendingDialog from "./spendingDialog.vue"; // 添加支出数据组件
