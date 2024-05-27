@@ -1,8 +1,12 @@
 {
-  "name": "vite-project",
+  "name": "dutch-treatment",
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "author": {
+    "name": "baiwumm",
+    "email": "baiwumm@foxmail.com"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -12,7 +16,7 @@
   "dependencies": {
     "@ant-design/icons": "^5.1.4",
     "ahooks": "^3.7.7",
-    "antd": "^5.6.1",
+    "antd": "^5.17.3",
     "dayjs": "^1.11.8",
     "lodash-es": "^4.17.21",
     "nanoid": "^4.0.2",
