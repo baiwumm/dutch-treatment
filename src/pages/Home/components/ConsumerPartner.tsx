@@ -1,12 +1,10 @@
 import { ExclamationCircleFilled, PlusOutlined, UserOutlined } from '@ant-design/icons'
-import { useMount } from 'ahooks';
 import { Button, Modal, Space, Tag } from 'antd'
 import { LabeledValue, SelectValue } from 'antd/es/select'
 import type { ColumnsType, ColumnType } from 'antd/es/table';
 import { filter, isArray, map, sum } from 'lodash-es'
 import { FC, MouseEvent, RefObject } from 'react'
 
-import { consumerPartnerMap } from '../utils/config'
 import { TableColumnsProps } from '../utils/interface'
 
 type IProps = {
@@ -64,11 +62,6 @@ const ConsumerPartner: FC<IProps> = ({
     });
   }
 
-  useMount(() => {
-    if (!localPartners?.length) {
-      setLocalPartners(consumerPartnerMap)
-    }
-  })
   return (
     <Space size={[0, 8]} wrap>
       <span>本次参与消费的伙伴有：</span>

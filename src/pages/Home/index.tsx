@@ -155,6 +155,7 @@ const Home: FC = () => {
             setConsumptionModalTrue={setConsumptionModalTrue}
             localTableData={localTableData}
             setLocalTableData={setLocalTableData}
+            localPartners={localPartners}
             setLocalPartners={setLocalPartners}
             localTableColumns={localTableColumns}
             setLocalTableColumns={setLocalTableColumns}

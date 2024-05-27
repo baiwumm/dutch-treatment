@@ -11,12 +11,13 @@ import type { ColumnsType, ColumnType } from 'antd/es/table';
 import { map, reduce, round, subtract, sum, toNumber } from 'lodash-es'
 import { FC, RefObject } from 'react'
 
-import { consumerPartnerMap, defaultColumns } from '../utils/config'
+import { defaultColumns } from '../utils/config'
 import { TableColumnsProps } from '../utils/interface'
 
 type IProps = {
   setConsumptionModalTrue: () => void;
   localTableData: TableColumnsProps[] | undefined;
+  localPartners: LabeledValue[],
   setLocalPartners: (values: LabeledValue[]) => void;
   localTableColumns: ColumnsType<TableColumnsProps> | undefined;
   setLocalTableColumns: (values: ColumnsType<TableColumnsProps>) => void;
@@ -36,6 +37,7 @@ const TableTemplate: FC<IProps> = ({
   setConsumptionModalTrue,
   localTableData,
   localTableColumns = [],
+  localPartners,
   setLocalPartners,
   setLocalTableColumns,
   setLocalTableData,
@@ -57,7 +59,7 @@ const TableTemplate: FC<IProps> = ({
       content: '清空数据后，表格中的数据不可恢复，确认清空吗？',
       onOk() {
         // 更新 localstorage 数据
-        setLocalPartners(consumerPartnerMap)
+        setLocalPartners([])
         // 清空表格数据
         setLocalTableData([])
         // 设置表头
@@ -90,7 +92,7 @@ const TableTemplate: FC<IProps> = ({
             })
           }
           <Table.Summary.Cell index={localTableColumns.length}>
-            <Button size="small" onClick={setExpenditureModalTrue}>编辑</Button>
+            <Button size="small" onClick={setExpenditureModalTrue} disabled={!localPartners?.length}>编辑</Button>
           </Table.Summary.Cell>
         </Table.Summary.Row>
         <Table.Summary.Row style={{ textAlign: 'center', fontWeight: 'bold' }}>
